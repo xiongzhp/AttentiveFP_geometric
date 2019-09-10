@@ -1,0 +1,18 @@
+--- /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
++++ /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
+@@ -3,7 +3,7 @@
+     def softmax(self, x, index, num=None):
+         x = x - scatter_max(x, index, dim=0, dim_size=num)[0][index]
+         x = x.exp()
+-        x = x / (scatter_add(x, index, dim=0, dim_size=num)[index] + 1e-8)
++        x = x / (scatter_add(x, index, dim=0, dim_size=num)[index] + 1e-16)
+         return x
+     
+     def __init__(self, fingerprint_dim, p_dropout):
+@@ -34,5 +34,5 @@
+ 
+         update = self.gru(context, superatom) 
+ 
+-        return update, attention_weight
++        return update
+ 

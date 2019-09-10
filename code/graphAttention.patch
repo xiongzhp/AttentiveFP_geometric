@@ -1,0 +1,22 @@
+--- /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
++++ /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
+@@ -2,7 +2,7 @@
+     def softmax(self, x, index, num=None):
+         x = x - scatter_max(x, index, dim=0, dim_size=num)[0][index]
+         x = x.exp()
+-        x = x / (scatter_add(x, index, dim=0, dim_size=num)[index] + 1e-8)
++        x = x / (scatter_add(x, index, dim=0, dim_size=num)[index] + 1e-16)
+         return x
+ 
+     def __init__(self, bond_dim, fingerprint_dim, p_dropout):
+@@ -29,7 +29,9 @@
+ 
+         neighbor = neighbor_atom.view(-1, 1, atom_dim) @ bond  # 12,1,128        
+         neighbor = neighbor.view(-1, atom_dim) 
+-                
++        
++#         neighbor = self.encoder(torch.cat([bond, neighbor_atom],-1))  # concat
++        
+         target_atom = atom[bond_index[0]]  # 获得所有边的第一个节点的特征 
+         
+         feature_align = torch.cat([target_atom, neighbor],dim=-1)

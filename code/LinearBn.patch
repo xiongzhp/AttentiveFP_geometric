@@ -1,0 +1,11 @@
+--- /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
++++ /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
+@@ -2,7 +2,7 @@
+     def __init__(self, in_channel, out_channel, act=None):
+         super(LinearBn, self).__init__()
+         self.linear = nn.Linear(in_channel, out_channel)
+-#         self.bn = nn.BatchNorm1d(out_channel, eps=1e-06, momentum=0.1)
++        self.bn = nn.BatchNorm1d(out_channel, eps=1e-06, momentum=0.1)
+         self.act = act
+ 
+     def forward(self, x):

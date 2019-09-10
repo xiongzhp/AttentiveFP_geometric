@@ -1,0 +1,37 @@
+--- /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
++++ /data2/erikxiong/AttentiveFP/code/AttentiveFP/AttentiveLayers_new3.py
+@@ -10,9 +10,8 @@
+             nn.ReLU(inplace=True),
+         )
+     
+-        self.propagate = nn.ModuleList([graphAttention(bond_dim, fingerprint_dim, p_dropout) for _ in range(K)])
+-#         self.superGather = superatomAttention(fingerprint_dim, p_dropout=p_dropout)
+-        self.superGather = nn.ModuleList([superatomAttention(fingerprint_dim, p_dropout) for _ in range(T)])
++        self.propagate = nn.ModuleList([graphAttention(bond_dim, fingerprint_dim, p_dropout=p_dropout) for _ in range(K)])
++        self.superGather = nn.ModuleList([superatomAttention(fingerprint_dim, p_dropout=p_dropout) for _ in range(T)])
+     
+         self.predict = nn.Sequential(
+             LinearBn(fingerprint_dim, 512),
+@@ -27,14 +26,19 @@
+ 
+         atoms = []
+         for k in range(self.K):
++            atoms.append(atom)
+             atom = self.propagate[k](atom, bond_index, bond)
+ 
++#         atom = torch.stack(atoms)
++#         atom = torch.mean(atom, dim=0)
+         superatom_num = mol_index.max()+1
+-        superatom = scatter_('add', atom, mol_index, dim_size=superatom_num) # get init superatom by sum
++        superatom = scatter_('add', atom, mol_index, dim_size=superatom_num) # get init superatom by mean
+         superatoms = []
+-        
+         for t in range(self.T):
+-            superatom, attention_weight = self.superGather[t](superatom, atom, mol_index) 
++            superatoms.append(superatom)
++            superatom = self.superGather[t](superatom, atom, mol_index) 
++            
++        superatoms.append(superatom)
+ 
+         predict = self.predict(superatom)
+ 
